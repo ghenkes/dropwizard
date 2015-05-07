@@ -5,66 +5,100 @@
     <parent>
         <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-parent</artifactId>
-        <version>0.8.1</version>
+        <version>0.8.1-GABE</version>
     </parent>
 
     <artifactId>dropwizard-core</artifactId>
     <name>Dropwizard</name>
 
+    <properties>
+        <dropwizard.version>0.8.1</dropwizard.version>
+    </properties>
+
+
     <dependencies>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-util</artifactId>
-            <version>${project.version}</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-jackson</artifactId>
-            <version>${project.version}</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-validation</artifactId>
-            <version>${project.version}</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-configuration</artifactId>
-            <version>${project.version}</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-logging</artifactId>
-            <version>${project.version}</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-metrics</artifactId>
-            <version>${project.version}</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-jersey</artifactId>
-            <version>${project.version}</version>
+            <version>0.7.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.codahale.metrics</groupId>
+                    <artifactId>metrics-jersey</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.dropwizard</groupId>
+                    <artifactId>dropwizard-jackson</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.dropwizard</groupId>
+                    <artifactId>dropwizard-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.dropwizard</groupId>
+                    <artifactId>dropwizard-validation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-servlets</artifactId>
-            <version>${project.version}</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-jetty</artifactId>
-            <version>${project.version}</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-lifecycle</artifactId>
-            <version>${project.version}</version>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
+            <version>${metrics3.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jersey</artifactId>
             <version>${metrics3.version}</version>
             <exclusions>
                 <exclusion>
@@ -130,10 +164,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-            <artifactId>jersey-test-framework-provider-inmemory</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>org.glassfish.jersey.test-framework.providers</groupId>-->
+        <!--<artifactId>jersey-test-framework-provider-inmemory</artifactId>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
     </dependencies>
 </project>

@@ -13,12 +13,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.Resources;
-import io.dropwizard.jersey.errors.EarlyEofExceptionMapper;
+//import io.dropwizard.jersey.errors.EarlyEofExceptionMapper;
 import io.dropwizard.jersey.errors.LoggingExceptionMapper;
 import io.dropwizard.jersey.filter.AllowedMethodsFilter;
 import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.jersey.validation.ConstraintViolationExceptionMapper;
-import org.glassfish.jersey.servlet.ServletContainer;
+//import org.glassfish.jersey.servlet.ServletContainer;
 import io.dropwizard.jersey.jackson.JacksonMessageBodyProvider;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.jetty.GzipFilterFactory;
@@ -481,7 +481,7 @@ public abstract class AbstractServerFactory implements ServerFactory {
                 });
                 jersey.register(new ConstraintViolationExceptionMapper());
                 jersey.register(new JsonProcessingExceptionMapper());
-                jersey.register(new EarlyEofExceptionMapper());
+                //jersey.register(new EarlyEofExceptionMapper());
             }
             handler.addServlet(new NonblockingServletHolder(jerseyContainer), jersey.getUrlPattern());
         }

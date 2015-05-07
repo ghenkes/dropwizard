@@ -19,7 +19,7 @@ import io.dropwizard.servlets.tasks.Task;
 import io.dropwizard.setup.Environment;
 import org.eclipse.jetty.server.AbstractNetworkConnector;
 import org.eclipse.jetty.server.Server;
-import org.glassfish.jersey.server.ResourceConfig;
+// import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,16 +48,15 @@ public class SimpleServerFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-        objectMapper.getSubtypeResolver().registerSubtypes(ConsoleAppenderFactory.class,
-                FileAppenderFactory.class, SyslogAppenderFactory.class, HttpConnectorFactory.class);
-        http = new ConfigurationFactory<>(SimpleServerFactory.class, validator, objectMapper, "dw")
-                .build(new File(Resources.getResource("yaml/simple_server.yml").toURI()));
+        objectMapper.getSubtypeResolver().registerSubtypes(ConsoleAppenderFactory.class, FileAppenderFactory.class,
+                SyslogAppenderFactory.class, HttpConnectorFactory.class);
+        http = new ConfigurationFactory<>(SimpleServerFactory.class, validator, objectMapper, "dw").build(new File(
+                Resources.getResource("yaml/simple_server.yml").toURI()));
     }
 
     @Test
     public void isDiscoverable() throws Exception {
-        assertThat(new DiscoverableSubtypeResolver().getDiscoveredSubtypes())
-                .contains(SimpleServerFactory.class);
+        assertThat(new DiscoverableSubtypeResolver().getDiscoveredSubtypes()).contains(SimpleServerFactory.class);
     }
 
     @Test
@@ -78,8 +77,8 @@ public class SimpleServerFactoryTest {
 
     @Test
     public void testBuild() throws Exception {
-        final Environment environment = new Environment("testEnvironment", objectMapper, validator, new MetricRegistry(),
-                ClassLoader.getSystemClassLoader());
+        final Environment environment = new Environment("testEnvironment", objectMapper, validator,
+                new MetricRegistry(), ClassLoader.getSystemClassLoader());
         environment.jersey().register(new TestResource());
         environment.admin().addTask(new TestTask());
 
@@ -89,8 +88,8 @@ public class SimpleServerFactoryTest {
         final int port = ((AbstractNetworkConnector) server.getConnectors()[0]).getLocalPort();
         assertThat(httpRequest("GET", "http://localhost:" + port + "/service/test"))
                 .isEqualTo("{\"hello\": \"World\"}");
-        assertThat(httpRequest("POST", "http://localhost:" + port + "/secret/tasks/hello?name=test_user"))
-                .isEqualTo("Hello, test_user!");
+        assertThat(httpRequest("POST", "http://localhost:" + port + "/secret/tasks/hello?name=test_user")).isEqualTo(
+                "Hello, test_user!");
 
         server.stop();
     }

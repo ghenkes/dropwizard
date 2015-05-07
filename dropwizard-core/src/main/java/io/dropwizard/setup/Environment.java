@@ -10,7 +10,7 @@ import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.jetty.MutableServletContextHandler;
 import io.dropwizard.jetty.setup.ServletEnvironment;
 import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
-import org.glassfish.jersey.servlet.ServletContainer;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import javax.servlet.Servlet;
 import javax.validation.Validator;
