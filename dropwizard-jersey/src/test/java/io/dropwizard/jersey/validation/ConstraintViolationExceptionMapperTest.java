@@ -4,7 +4,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import io.dropwizard.logging.LoggingFactory;
+import io.dropwizard.logging.BootstrapLogging;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
@@ -17,7 +17,7 @@ import static org.junit.Assume.assumeThat;
 
 public class ConstraintViolationExceptionMapperTest extends JerseyTest {
     static {
-        LoggingFactory.bootstrap();
+        BootstrapLogging.bootstrap();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ConstraintViolationExceptionMapperTest extends JerseyTest {
                     .isEqualTo(422);
 
             assertThat(e.getResponse().getEntity(String.class))
-                    .isEqualTo("{\"errors\":[\"name may not be empty (was null)\"]}");
+                    .isEqualTo("{\"errors\":[\"name may not be empty\"]}");
         }
     }
 }

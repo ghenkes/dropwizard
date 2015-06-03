@@ -1,34 +1,5 @@
 package io.dropwizard.jersey.jackson;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreType;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Objects;
-import com.google.common.reflect.TypeToken;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.sun.jersey.core.util.StringKeyObjectValueIgnoreCaseMultivaluedMap;
-import io.dropwizard.jackson.Jackson;
-import io.dropwizard.validation.ConstraintViolations;
-import io.dropwizard.validation.Validated;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-import javax.validation.Validation;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.*;
-
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.hamcrest.CoreMatchers.is;
@@ -37,6 +8,43 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+
+import org.hibernate.validator.constraints.NotEmpty;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Objects;
+import com.google.common.reflect.TypeToken;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.sun.jersey.core.util.StringKeyObjectValueIgnoreCaseMultivaluedMap;
+
+import io.dropwizard.jackson.Jackson;
+import io.dropwizard.validation.ConstraintViolations;
+import io.dropwizard.validation.Validated;
 
 // TODO: 4/24/13 <coda> -- move JacksonMessageBodyProviderTest to JerseyTest
 
@@ -226,7 +234,7 @@ public class JacksonMessageBodyProviderTest {
             failBecauseExceptionWasNotThrown(ConstraintViolationException.class);
         } catch(ConstraintViolationException e) {
             assertThat(ConstraintViolations.formatUntyped(e.getConstraintViolations()))
-                .containsOnly("text may not be null (was null)");
+                .containsOnly("text may not be null");
         }
     }
 
@@ -270,7 +278,7 @@ public class JacksonMessageBodyProviderTest {
             failBecauseExceptionWasNotThrown(ConstraintViolationException.class);
         } catch (ConstraintViolationException e) {
             assertThat(ConstraintViolations.formatUntyped(e.getConstraintViolations()))
-                    .containsOnly("id must be greater than or equal to 0 (was -1)");
+                    .containsOnly("id must be greater than or equal to 0");
         }
     }
 
@@ -431,8 +439,8 @@ public class JacksonMessageBodyProviderTest {
             failBecauseExceptionWasNotThrown(ConstraintViolationException.class);
         } catch (ConstraintViolationException e) {
             assertThat(ConstraintViolations.formatUntyped(e.getConstraintViolations()))
-                    .contains("id must be greater than or equal to 0 (was -1)",
-                            "id must be greater than or equal to 0 (was -2)");
+                    .contains("id must be greater than or equal to 0",
+                            "id must be greater than or equal to 0");
         }
     }
 
@@ -454,7 +462,7 @@ public class JacksonMessageBodyProviderTest {
             failBecauseExceptionWasNotThrown(ConstraintViolationException.class);
         } catch (ConstraintViolationException e) {
             assertThat(ConstraintViolations.formatUntyped(e.getConstraintViolations()))
-                    .contains("id must be greater than or equal to 0 (was -2)");
+                    .contains("id must be greater than or equal to 0");
         }
     }
 
@@ -476,8 +484,8 @@ public class JacksonMessageBodyProviderTest {
             failBecauseExceptionWasNotThrown(ConstraintViolationException.class);
         } catch (ConstraintViolationException e) {
             assertThat(ConstraintViolations.formatUntyped(e.getConstraintViolations()))
-                    .contains("id must be greater than or equal to 0 (was -1)",
-                            "id must be greater than or equal to 0 (was -2)");
+                    .contains("id must be greater than or equal to 0",
+                            "id must be greater than or equal to 0");
         }
     }
 
@@ -499,8 +507,8 @@ public class JacksonMessageBodyProviderTest {
             failBecauseExceptionWasNotThrown(ConstraintViolationException.class);
         } catch (ConstraintViolationException e) {
             assertThat(ConstraintViolations.formatUntyped(e.getConstraintViolations()))
-                    .containsOnly("id must be greater than or equal to 0 (was -1)",
-                            "id must be greater than or equal to 0 (was -2)");
+                    .containsOnly("id must be greater than or equal to 0",
+                            "id must be greater than or equal to 0");
         }
     }
 
@@ -522,8 +530,8 @@ public class JacksonMessageBodyProviderTest {
             failBecauseExceptionWasNotThrown(ConstraintViolationException.class);
         } catch (ConstraintViolationException e) {
             assertThat(ConstraintViolations.formatUntyped(e.getConstraintViolations()))
-                    .contains("id must be greater than or equal to 0 (was -1)",
-                            "id must be greater than or equal to 0 (was -2)");
+                    .contains("id must be greater than or equal to 0",
+                            "id must be greater than or equal to 0");
         }
     }
 
@@ -569,7 +577,7 @@ public class JacksonMessageBodyProviderTest {
             failBecauseExceptionWasNotThrown(ConstraintViolationException.class);
         } catch (ConstraintViolationException e) {
             assertThat(ConstraintViolations.formatUntyped(e.getConstraintViolations()))
-                    .containsOnly("examples may not be empty (was null)");
+                    .containsOnly("examples may not be empty");
         }
     }
 

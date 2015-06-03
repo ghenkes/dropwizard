@@ -5,7 +5,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import io.dropwizard.logging.LoggingFactory;
+import io.dropwizard.logging.BootstrapLogging;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 
 public class AllowedMethodsFilterTest extends JerseyTest {
     static {
-        LoggingFactory.bootstrap();
+        BootstrapLogging.bootstrap();
     }
 
     private static final int DISALLOWED_STATUS_CODE = ClientResponse.Status.METHOD_NOT_ALLOWED.getStatusCode();
