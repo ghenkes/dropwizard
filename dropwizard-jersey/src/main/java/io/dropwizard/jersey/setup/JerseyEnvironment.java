@@ -3,7 +3,6 @@ package io.dropwizard.jersey.setup;
 import com.google.common.base.Function;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.scanning.PackageNamesScanner;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 import io.dropwizard.jersey.DropwizardResourceConfig;
 
 import javax.annotation.Nullable;
@@ -24,7 +23,7 @@ public class JerseyEnvironment {
         holder.setContainer(null);
     }
 
-    public void replace(Function<ResourceConfig, ServletContainer> replace) {
+    public void replace(Function<ResourceConfig, JerseyServletContainer> replace) {
         holder.setContainer(replace.apply(config));
     }
 

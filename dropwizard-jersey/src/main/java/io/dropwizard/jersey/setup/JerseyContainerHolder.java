@@ -1,19 +1,17 @@
 package io.dropwizard.jersey.setup;
 
-import com.sun.jersey.spi.container.servlet.ServletContainer;
-
 public class JerseyContainerHolder {
-    private ServletContainer container;
+    private JerseyServletContainer container;
 
-    public JerseyContainerHolder(ServletContainer container) {
+    public JerseyContainerHolder(JerseyServletContainer container) {
         this.container = container;
     }
 
-    public ServletContainer getContainer() {
+    public JerseyServletContainer getContainer() {
         return container;
     }
 
-    public void setContainer(ServletContainer container) {
+    public void setContainer(JerseyServletContainer container) {
         this.container = container;
     }
 }
