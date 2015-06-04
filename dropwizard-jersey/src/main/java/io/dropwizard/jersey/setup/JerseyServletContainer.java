@@ -1,7 +1,7 @@
 package io.dropwizard.jersey.setup;
 
-import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import io.dropwizard.jersey.DropwizardResourceConfig;
 
 /**
  * Extends {@link ServletContainer} to provide consumers of dropwizard-jersey a means of obtaining a ServletContainer
@@ -21,7 +21,7 @@ public class JerseyServletContainer extends ServletContainer {
      * Create Jersey Servlet container.
      * @param resourceConfig container configuration.
      */
-    public JerseyServletContainer(final ResourceConfig resourceConfig) {
+    public JerseyServletContainer(final DropwizardResourceConfig resourceConfig) {
         super(resourceConfig);
     }
 }
