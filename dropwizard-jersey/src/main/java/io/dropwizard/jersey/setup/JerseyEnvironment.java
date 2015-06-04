@@ -1,21 +1,20 @@
 package io.dropwizard.jersey.setup;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.annotation.Nullable;
+import javax.servlet.Servlet;
+
 import com.google.common.base.Function;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.scanning.PackageNamesScanner;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 import io.dropwizard.jersey.DropwizardResourceConfig;
-
-import javax.annotation.Nullable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class JerseyEnvironment {
     private final JerseyContainerHolder holder;
     private final DropwizardResourceConfig config;
 
-    public JerseyEnvironment(JerseyContainerHolder holder,
-                             DropwizardResourceConfig config) {
+    public JerseyEnvironment(JerseyContainerHolder holder, DropwizardResourceConfig config) {
         this.holder = holder;
         this.config = config;
     }
@@ -24,13 +23,12 @@ public class JerseyEnvironment {
         holder.setContainer(null);
     }
 
-    public void replace(Function<ResourceConfig, ServletContainer> replace) {
+    public void replace(Function<ResourceConfig, Servlet> replace) {
         holder.setContainer(replace.apply(config));
     }
 
     /**
      * Adds the given object as a Jersey singleton component.
-     *
      * @param component a Jersey singleton component
      */
     public void register(Object component) {
@@ -38,9 +36,9 @@ public class JerseyEnvironment {
     }
 
     /**
-     * Adds the given class as a Jersey component. <p/><b>N.B.:</b> This class must either have a
-     * no-args constructor or use Jersey's built-in dependency injection.
-     *
+     * Adds the given class as a Jersey component.
+     * <p/>
+     * <b>N.B.:</b> This class must either have a no-args constructor or use Jersey's built-in dependency injection.
      * @param componentClass a Jersey component class
      */
     public void register(Class<?> componentClass) {
@@ -48,9 +46,8 @@ public class JerseyEnvironment {
     }
 
     /**
-     * Adds array of package names which will be used to scan for components. Packages will be
-     * scanned recursively, including all nested packages.
-     *
+     * Adds array of package names which will be used to scan for components. Packages will be scanned recursively,
+     * including all nested packages.
      * @param packages array of package names
      */
     public void packages(String... packages) {
@@ -59,7 +56,6 @@ public class JerseyEnvironment {
 
     /**
      * Enables the Jersey feature with the given name.
-     *
      * @param featureName the name of the feature to be enabled
      * @see com.sun.jersey.api.core.ResourceConfig
      */
@@ -69,7 +65,6 @@ public class JerseyEnvironment {
 
     /**
      * Disables the Jersey feature with the given name.
-     *
      * @param featureName the name of the feature to be disabled
      * @see com.sun.jersey.api.core.ResourceConfig
      */
@@ -79,8 +74,7 @@ public class JerseyEnvironment {
 
     /**
      * Sets the given Jersey property.
-     *
-     * @param name  the name of the Jersey property
+     * @param name the name of the Jersey property
      * @param value the value of the Jersey property
      * @see com.sun.jersey.api.core.ResourceConfig
      */
@@ -90,7 +84,6 @@ public class JerseyEnvironment {
 
     /**
      * Gets the given Jersey property.
-     *
      * @param name the name of the Jersey property
      * @see com.sun.jersey.api.core.ResourceConfig
      */
