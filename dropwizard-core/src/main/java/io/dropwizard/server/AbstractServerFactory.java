@@ -24,6 +24,7 @@ import io.dropwizard.jetty.GzipFilterFactory;
 import io.dropwizard.jetty.MutableServletContextHandler;
 import io.dropwizard.jetty.NonblockingServletHolder;
 import io.dropwizard.jetty.RequestLogFactory;
+import io.dropwizard.jetty.Slf4jRequestLogFactory;
 import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
 import io.dropwizard.servlets.ThreadNameFilter;
 import io.dropwizard.util.Duration;
@@ -204,7 +205,7 @@ public abstract class AbstractServerFactory implements ServerFactory {
 
     @Valid
     @NotNull
-    private RequestLogFactory requestLog = new RequestLogFactory();
+    private RequestLogFactory requestLog = new Slf4jRequestLogFactory();
 
     @Valid
     @NotNull
