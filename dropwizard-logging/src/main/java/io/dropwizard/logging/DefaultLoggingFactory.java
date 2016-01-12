@@ -1,11 +1,33 @@
 package io.dropwizard.logging;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.PrintStream;
+import java.lang.management.ManagementFactory;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.jmx.JMXConfigurator;
 import ch.qos.logback.classic.jul.LevelChangePropagator;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Layout;
 import ch.qos.logback.core.util.StatusPrinter;
+
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.logback.InstrumentedAppender;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,18 +39,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
 import io.dropwizard.jackson.Jackson;
-
-import javax.management.*;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.io.PrintStream;
-import java.lang.management.ManagementFactory;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import io.dropwizard.logging.filter.FilterFactory;
+import io.dropwizard.logging.filter.ThresholdFilterFactory;
 
 @JsonTypeName("default")
 public class DefaultLoggingFactory implements LoggingFactory {
@@ -39,12 +53,17 @@ public class DefaultLoggingFactory implements LoggingFactory {
     private Level level = Level.INFO;
 
     @NotNull
+    private TimeZone timeZone = TimeZone.getTimeZone("UTC");
+
+    private Optional<String> logFormat = Optional.empty();
+
+    @NotNull
     private ImmutableMap<String, JsonNode> loggers = ImmutableMap.of();
 
     @Valid
     @NotNull
-    private ImmutableList<AppenderFactory> appenders = ImmutableList.<AppenderFactory>of(
-            new ConsoleAppenderFactory()
+    private ImmutableList<AppenderFactory<ILoggingEvent>> appenders = ImmutableList.<AppenderFactory<ILoggingEvent>>of(
+            new ConsoleAppenderFactory<ILoggingEvent>()
     );
 
     @JsonIgnore
@@ -84,6 +103,26 @@ public class DefaultLoggingFactory implements LoggingFactory {
     }
 
     @JsonProperty
+    public TimeZone getTimeZone() {
+        return timeZone;
+    }
+
+    @JsonProperty
+    public void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    @JsonProperty
+    public String getLogFormat() {
+        return logFormat.orElse(getDefaultLogFormat(timeZone));
+    }
+
+    @JsonProperty
+    public void setLogFormat(String logFormat) {
+        this.logFormat = Optional.ofNullable(logFormat);
+    }
+
+    @JsonProperty
     public ImmutableMap<String, JsonNode> getLoggers() {
         return loggers;
     }
@@ -94,12 +133,12 @@ public class DefaultLoggingFactory implements LoggingFactory {
     }
 
     @JsonProperty
-    public ImmutableList<AppenderFactory> getAppenders() {
+    public ImmutableList<AppenderFactory<ILoggingEvent>> getAppenders() {
         return appenders;
     }
 
     @JsonProperty
-    public void setAppenders(List<AppenderFactory> appenders) {
+    public void setAppenders(List<AppenderFactory<ILoggingEvent>> appenders) {
         this.appenders = ImmutableList.copyOf(appenders);
     }
 
@@ -114,8 +153,13 @@ public class DefaultLoggingFactory implements LoggingFactory {
             CHANGE_LOGGER_CONTEXT_LOCK.unlock();
         }
 
-        for (AppenderFactory output : appenders) {
-            root.addAppender(output.build(loggerContext, name, null));
+        final FilterFactory<ILoggingEvent> thresholdFilterFactory = new ThresholdFilterFactory();
+        final AsyncAppenderFactory<ILoggingEvent> asyncAppenderFactory = new AsyncLoggingEventAppenderFactory();
+
+        for (AppenderFactory<ILoggingEvent> output : appenders) {
+            final Layout<ILoggingEvent> layout = new DropwizardLayout(loggerContext, getLogFormat());
+            layout.start();
+            root.addAppender(output.build(loggerContext, name, layout, thresholdFilterFactory, asyncAppenderFactory));
         }
 
         StatusPrinter.setPrintStream(configurationErrorsStream);
@@ -174,6 +218,9 @@ public class DefaultLoggingFactory implements LoggingFactory {
 
         root.setLevel(level);
 
+        final FilterFactory<ILoggingEvent> thresholdFilterFactory = new ThresholdFilterFactory();
+        final AsyncAppenderFactory<ILoggingEvent> asyncAppenderFactory = new AsyncLoggingEventAppenderFactory();
+
         for (Map.Entry<String, JsonNode> entry : loggers.entrySet()) {
             final Logger logger = loggerContext.getLogger(entry.getKey());
             final JsonNode jsonNode = entry.getValue();
@@ -190,8 +237,11 @@ public class DefaultLoggingFactory implements LoggingFactory {
                 }
                 logger.setLevel(configuration.getLevel());
                 logger.setAdditive(configuration.isAdditive());
-                for (AppenderFactory appender : configuration.getAppenders()) {
-                    logger.addAppender(appender.build(loggerContext, name, null));
+
+                for (AppenderFactory<ILoggingEvent> appender : configuration.getAppenders()) {
+                    final Layout<ILoggingEvent> layout = new DropwizardLayout(loggerContext, configuration.getLogFormat());
+                    layout.start();
+                    logger.addAppender(appender.build(loggerContext, name, layout, thresholdFilterFactory, asyncAppenderFactory));
                 }
             } else {
                 throw new IllegalArgumentException("Unsupported format of logger '" + entry.getKey() + "'");
@@ -208,5 +258,9 @@ public class DefaultLoggingFactory implements LoggingFactory {
                 .add("loggers", loggers)
                 .add("appenders", appenders)
                 .toString();
+    }
+
+    private static String getDefaultLogFormat(TimeZone timeZone) {
+        return "%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m%n%rEx";
     }
 }
