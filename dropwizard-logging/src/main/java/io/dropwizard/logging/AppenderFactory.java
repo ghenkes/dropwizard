@@ -37,4 +37,6 @@ public interface AppenderFactory<E> extends Discoverable {
                                   Layout<E> layout,
                                   FilterFactory<E> thresholdFilterFactory,
                                   AsyncAppenderFactory<E> asyncAppenderFactory);
+
+    String getLogFormat();
 }

@@ -10,8 +10,6 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.Level;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.TimeZone;
 
 /**
  * Individual {@link Logger} configuration
@@ -26,11 +24,6 @@ public class LoggerConfiguration {
     private ImmutableList<AppenderFactory<ILoggingEvent>> appenders = ImmutableList.of();
 
     private boolean additive = true;
-
-    @NotNull
-    private TimeZone timeZone = TimeZone.getTimeZone("UTC");
-
-    private Optional<String> logFormat = Optional.empty();
 
     public boolean isAdditive() {
         return additive;
@@ -54,17 +47,5 @@ public class LoggerConfiguration {
 
     public void setAppenders(List<AppenderFactory<ILoggingEvent>> appenders) {
         this.appenders = ImmutableList.copyOf(appenders);
-    }
-
-    public String getLogFormat() {
-        return logFormat.orElse(getDefaultLogFormat(timeZone));
-    }
-
-    public void setLogFormat(String logFormat) {
-        this.logFormat = Optional.ofNullable(logFormat);
-    }
-
-    private static String getDefaultLogFormat(TimeZone timeZone) {
-        return "%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m%n%rEx";
     }
 }

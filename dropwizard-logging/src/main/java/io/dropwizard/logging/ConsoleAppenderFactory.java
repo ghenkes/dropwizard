@@ -78,22 +78,8 @@ public class ConsoleAppenderFactory<E extends DeferredProcessingAware> extends A
         }
     }
 
-    //TODO
-    @NotNull
-    private TimeZone timeZone = TimeZone.getTimeZone("UTC");
-
     @NotNull
     private ConsoleStream target = ConsoleStream.STDOUT;
-
-    @JsonProperty
-    public TimeZone getTimeZone() {
-        return timeZone;
-    }
-
-    @JsonProperty
-    public void setTimeZone(TimeZone timeZone) {
-        this.timeZone = timeZone;
-    }
 
     @JsonProperty
     public ConsoleStream getTarget() {

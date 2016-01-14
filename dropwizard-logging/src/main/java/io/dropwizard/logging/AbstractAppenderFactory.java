@@ -1,6 +1,8 @@
 package io.dropwizard.logging;
 
-import javax.crypto.IllegalBlockSizeException;
+import java.util.Optional;
+import java.util.TimeZone;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -55,14 +57,45 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * </table>
  */
 public abstract class AbstractAppenderFactory<E extends DeferredProcessingAware> implements AppenderFactory<E> {
+
+    private static String getDefaultLogFormat(TimeZone timeZone) {
+        return "%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m%n%rEx";
+    }
+
     @NotNull
     protected Level threshold = Level.ALL;
+
+    protected Optional<String> logFormat = Optional.empty();
+
+    @NotNull
+    protected TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
     @Min(1)
     @Max(Integer.MAX_VALUE)
     private int queueSize = AsyncAppenderBase.DEFAULT_QUEUE_SIZE;
 
     private int discardingThreshold = -1;
+
+    @JsonProperty
+    @Override
+    public String getLogFormat() {
+        return logFormat.orElse(getDefaultLogFormat(timeZone));
+    }
+
+    @JsonProperty
+    public void setLogFormat(String logFormat) {
+        this.logFormat = Optional.ofNullable(logFormat);
+    }
+
+    @JsonProperty
+    public TimeZone getTimeZone() {
+        return timeZone;
+    }
+
+    @JsonProperty
+    public void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone;
+    }
 
     private boolean includeCallerData = false;
 

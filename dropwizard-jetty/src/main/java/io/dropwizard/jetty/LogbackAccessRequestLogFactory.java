@@ -1,5 +1,6 @@
 package io.dropwizard.jetty;
 
+import java.util.Optional;
 import java.util.TimeZone;
 
 import javax.validation.Valid;
@@ -16,7 +17,6 @@ import ch.qos.logback.core.Layout;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import io.dropwizard.logging.AppenderFactory;
@@ -56,16 +56,6 @@ import io.dropwizard.logging.filter.NullFilterFactory;
 @JsonTypeName("logback-access")
 public class LogbackAccessRequestLogFactory implements RequestLogFactory {
 
-    private static String getDefaultLogFormat(TimeZone timeZone) {
-        return "%h %l %u [%t{dd/MMM/yyyy:HH:mm:ss Z," + timeZone.getID()
-                + "}] \"%r\" %s %b \"%i{Referer}\" \"%i{User-Agent}\" %D";
-    }
-
-    @NotNull
-    private TimeZone timeZone = TimeZone.getTimeZone("UTC");
-
-    private String logFormat;
-
     @Valid
     @NotNull
     private ImmutableList<AppenderFactory<IAccessEvent>> appenders = ImmutableList
@@ -81,31 +71,12 @@ public class LogbackAccessRequestLogFactory implements RequestLogFactory {
         this.appenders = appenders;
     }
 
-    @JsonProperty
-    public TimeZone getTimeZone() {
-        return timeZone;
-    }
-
-    @JsonProperty
-    public void setTimeZone(TimeZone timeZone) {
-        this.timeZone = timeZone;
-    }
-
-    @JsonProperty
-    public String getLogFormat() {
-        return logFormat == null ? getDefaultLogFormat(timeZone) : logFormat;
-    }
-
-    @JsonProperty
-    public void setLogFormat(String logFormat) {
-        this.logFormat = logFormat;
-    }
-
     @JsonIgnore
     public boolean isEnabled() {
         return !appenders.isEmpty();
     }
 
+    @Override
     public RequestLog build(String name) {
         final Logger logger = (Logger) LoggerFactory.getLogger("http.request");
         logger.setAdditive(false);
@@ -118,7 +89,7 @@ public class LogbackAccessRequestLogFactory implements RequestLogFactory {
         final AsyncAppenderFactory<IAccessEvent> asyncAppenderFactory = new AsyncAccessEventAppenderFactory();
 
         for (AppenderFactory<IAccessEvent> output : appenders) {
-            final Layout<IAccessEvent> layout = new DropwizardRequestLayout(context, getLogFormat());
+            final Layout<IAccessEvent> layout = new DropwizardRequestLayout(context, output.getLogFormat());
             layout.start();
             requestLog.addAppender(output.build(context, name, layout, thresholdFilterFactory, asyncAppenderFactory));
         }

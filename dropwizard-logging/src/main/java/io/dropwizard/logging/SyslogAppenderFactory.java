@@ -133,6 +133,7 @@ public class SyslogAppenderFactory extends AbstractAppenderFactory<ILoggingEvent
      * Returns the Logback pattern with which events will be formatted.
      */
     @JsonProperty
+    @Override
     public String getLogFormat() {
         return logFormat;
     }
@@ -141,6 +142,7 @@ public class SyslogAppenderFactory extends AbstractAppenderFactory<ILoggingEvent
      * Sets the Logback pattern with which events will be formatted.
      */
     @JsonProperty
+    @Override
     public void setLogFormat(String logFormat) {
         this.logFormat = logFormat;
     }

@@ -114,10 +114,6 @@ public class FileAppenderFactory<E extends DeferredProcessingAware> extends Abst
 
     private Size maxFileSize;
 
-    //TODO
-    @NotNull
-    private TimeZone timeZone = TimeZone.getTimeZone("UTC");
-
     @JsonProperty
     public String getCurrentLogFilename() {
         return currentLogFilename;
@@ -166,16 +162,6 @@ public class FileAppenderFactory<E extends DeferredProcessingAware> extends Abst
     @JsonProperty
     public void setMaxFileSize(Size maxFileSize) {
         this.maxFileSize = maxFileSize;
-    }
-
-    @JsonProperty
-    public TimeZone getTimeZone() {
-        return timeZone;
-    }
-
-    @JsonProperty
-    public void setTimeZone(TimeZone timeZone) {
-        this.timeZone = timeZone;
     }
 
     @JsonIgnore

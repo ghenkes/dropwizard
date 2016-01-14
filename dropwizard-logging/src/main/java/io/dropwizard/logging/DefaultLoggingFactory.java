@@ -6,8 +6,6 @@ import java.io.PrintStream;
 import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -51,11 +49,6 @@ public class DefaultLoggingFactory implements LoggingFactory {
 
     @NotNull
     private Level level = Level.INFO;
-
-    @NotNull
-    private TimeZone timeZone = TimeZone.getTimeZone("UTC");
-
-    private Optional<String> logFormat = Optional.empty();
 
     @NotNull
     private ImmutableMap<String, JsonNode> loggers = ImmutableMap.of();
@@ -103,26 +96,6 @@ public class DefaultLoggingFactory implements LoggingFactory {
     }
 
     @JsonProperty
-    public TimeZone getTimeZone() {
-        return timeZone;
-    }
-
-    @JsonProperty
-    public void setTimeZone(TimeZone timeZone) {
-        this.timeZone = timeZone;
-    }
-
-    @JsonProperty
-    public String getLogFormat() {
-        return logFormat.orElse(getDefaultLogFormat(timeZone));
-    }
-
-    @JsonProperty
-    public void setLogFormat(String logFormat) {
-        this.logFormat = Optional.ofNullable(logFormat);
-    }
-
-    @JsonProperty
     public ImmutableMap<String, JsonNode> getLoggers() {
         return loggers;
     }
@@ -157,7 +130,7 @@ public class DefaultLoggingFactory implements LoggingFactory {
         final AsyncAppenderFactory<ILoggingEvent> asyncAppenderFactory = new AsyncLoggingEventAppenderFactory();
 
         for (AppenderFactory<ILoggingEvent> output : appenders) {
-            final Layout<ILoggingEvent> layout = new DropwizardLayout(loggerContext, getLogFormat());
+            final Layout<ILoggingEvent> layout = new DropwizardLayout(loggerContext, output.getLogFormat());
             layout.start();
             root.addAppender(output.build(loggerContext, name, layout, thresholdFilterFactory, asyncAppenderFactory));
         }
@@ -239,7 +212,7 @@ public class DefaultLoggingFactory implements LoggingFactory {
                 logger.setAdditive(configuration.isAdditive());
 
                 for (AppenderFactory<ILoggingEvent> appender : configuration.getAppenders()) {
-                    final Layout<ILoggingEvent> layout = new DropwizardLayout(loggerContext, configuration.getLogFormat());
+                    final Layout<ILoggingEvent> layout = new DropwizardLayout(loggerContext, appender.getLogFormat());
                     layout.start();
                     logger.addAppender(appender.build(loggerContext, name, layout, thresholdFilterFactory, asyncAppenderFactory));
                 }
@@ -258,9 +231,5 @@ public class DefaultLoggingFactory implements LoggingFactory {
                 .add("loggers", loggers)
                 .add("appenders", appenders)
                 .toString();
-    }
-
-    private static String getDefaultLogFormat(TimeZone timeZone) {
-        return "%-5p [%d{ISO8601," + timeZone.getID() + "}] %c: %m%n%rEx";
     }
 }
